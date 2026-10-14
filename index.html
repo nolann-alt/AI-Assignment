@@ -62,17 +62,17 @@
         
         // ===== MOVING THE SNAKE =====
         const moveSnake = () => {
+            // The snake's old head
             const oldHead = snake[0];
+
+            // Calculate the new head
             const newHead = {
                 x: oldHead.x + direction.x,
                 y: oldHead.y + direction.y
             };
-
-            console.log(oldHead);
-            console.log(newHead);
-
-            snake[0].x = newHead.x
-            snake[0].y = newHead.y 
+            
+            snake.unshift(newHead); // Place the new head at index 0
+            snake.pop(); // removes the last segment
 
             drawGame();
         };
