@@ -59,6 +59,30 @@
         };
 
         drawGame();
+        
+        // ===== MOVING THE SNAKE =====
+        const moveSnake = () => {
+            const oldHead = snake[0];
+            const newHead = {
+                x: oldHead.x + direction.x,
+                y: oldHead.y + direction.y
+            };
+
+            console.log(oldHead);
+            console.log(newHead);
+
+            snake[0].x = newHead.x
+            snake[0].y = newHead.y 
+
+            drawGame();
+        };
+
+        setInterval(moveSnake, 200);
+
+
+        
+
+    
 
         // ===================================
         // BUILD THE GAME FROM HERE
