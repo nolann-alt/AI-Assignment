@@ -39,6 +39,7 @@
             y: Math.floor(Math.random() * tileCount)
         };
         let score = 0;
+        let gameOver = false;
 
         // ===== DRAWING =====
         const drawGame = () => {
@@ -62,10 +63,14 @@
             }
         };
 
-        drawGame();
-        
+        drawGame(); 
+
         // ===== MOVING THE SNAKE =====
         const moveSnake = () => {
+            if (gameOver) {
+                return;
+            }
+
             // The snake's old head
             const oldHead = snake[0];
 
@@ -74,7 +79,12 @@
                 x: oldHead.x + direction.x,
                 y: oldHead.y + direction.y
             };
-            
+
+            gameOverLogic(newHead);
+            if (gameOver) {
+                return;
+            }
+
             // When the snake will eat an apple, it will growth as well
             snake.unshift(newHead); // Place the new head at index 0
 
@@ -117,6 +127,22 @@
                 snake.pop(); // removes the last segment
             }
         }
+
+        // ===== Game over =====
+        const gameOverLogic = (newHead) => {
+            // Checking wall colision
+            if (newHead.x < 0 || newHead.x >= tileCount || newHead.y < 0 || newHead.y >= tileCount) {
+                gameOver = true;
+            } else if (hitsSnake(newHead)) {
+                gameOver = true;
+            }
+        }
+        // Looking if the new head correspond to a segment in the snake array
+        const hitsSnake = (newHead) => {
+            return snake.some((segment) => {
+                return segment.x === newHead.x && segment.y === newHead.y;
+            });
+        };
     
 
         // ===================================
