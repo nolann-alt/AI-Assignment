@@ -33,7 +33,11 @@
             { x: 8, y: 10 }
         ];
         let direction = { x: 1, y: 0 };
-        let food = { x: 15, y: 15 };
+        // Generate a random position for the apple
+        let food = {
+            x: Math.floor(Math.random() * tileCount),
+            y: Math.floor(Math.random() * tileCount)
+        };
         let score = 0;
 
         // ===== DRAWING =====
@@ -71,8 +75,10 @@
                 y: oldHead.y + direction.y
             };
             
+            // When the snake will eat an apple, it will growth as well
             snake.unshift(newHead); // Place the new head at index 0
-            snake.pop(); // removes the last segment
+
+            eatingAndGrowing(newHead);
 
             drawGame();
         };
@@ -97,7 +103,20 @@
         });
 
         // ===== Eating and growing =====
-
+        const eatingAndGrowing = (newHead) => {
+            if (newHead.x == food.x && newHead.y == food.y) {
+                // Generate a new random position for the apple into the game area
+                food.x = Math.floor(Math.random() * tileCount)
+                food.y = Math.floor(Math.random() * tileCount)
+                
+                // Increasing the score
+                score++;
+                console.log(score);
+                
+            } else {
+                snake.pop(); // removes the last segment
+            }
+        }
     
 
         // ===================================
