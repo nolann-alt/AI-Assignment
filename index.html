@@ -33,12 +33,27 @@
             { x: 9, y: 10 },
             { x: 8, y: 10 }
         ];
+        const generateFood = () => {
+            let newFood;
+
+            do {
+                newFood = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (
+                // Keep generating food while it overlaps the snake
+                snake.some((segment) => {
+                    return segment.x === newFood.x &&
+                        segment.y === newFood.y;
+                })
+            );
+
+            return newFood;
+        };
         let direction = { x: 1, y: 0 };
         // Generate a random position for the apple
-        let food = {
-            x: Math.floor(Math.random() * tileCount),
-            y: Math.floor(Math.random() * tileCount)
-        };
+        let food = generateFood();
         let score = 0;
         let gameOver = false;
 
@@ -99,26 +114,27 @@
         // ===== Keyboard controls =====
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowUp") {
-                direction.x = 0;
-                direction.y = -1;
+                changeDirection({ x: 0, y: -1 });
             } else if (event.key === "ArrowDown") {
-                direction.x = 0;
-                direction.y = 1;
+                changeDirection({ x: 0, y: 1 });
             } else if (event.key === "ArrowLeft") {
-                direction.x = -1;
-                direction.y = 0;
+                changeDirection({ x: -1, y: 0 });
             } else if (event.key === "ArrowRight") {
-                direction.x = 1;
-                direction.y = 0;
+                changeDirection({ x: 1, y: 0 });
             }
         });
+        // This function prevent the snake against colide itself unexpectedly
+        const changeDirection = (newDirection) => {
+            if (direction.x + newDirection.x !== 0 || direction.y + newDirection.y !== 0) {
+                direction = newDirection;
+            }
+        };
 
         // ===== Eating and growing =====
         const eatingAndGrowing = (newHead) => {
-            if (newHead.x == food.x && newHead.y == food.y) {
+            if (newHead.x === food.x && newHead.y === food.y) {
                 // Generate a new random position for the apple into the game area
-                food.x = Math.floor(Math.random() * tileCount)
-                food.y = Math.floor(Math.random() * tileCount)
+                food = generateFood();
                 
                 // Increasing the score
                 score++;
