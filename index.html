@@ -22,6 +22,7 @@
         // ===== GAME SETUP =====
         const canvas =
             document.getElementById("gameCanvas");
+        const info = document.getElementById("info"); // Get the score zone
         const ctx = canvas.getContext("2d");
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
@@ -121,7 +122,7 @@
                 
                 // Increasing the score
                 score++;
-                console.log(score);
+                info.textContent = "Score: " + score; // Display on the screen the score
                 
             } else {
                 snake.pop(); // removes the last segment
@@ -132,9 +133,9 @@
         const gameOverLogic = (newHead) => {
             // Checking wall colision
             if (newHead.x < 0 || newHead.x >= tileCount || newHead.y < 0 || newHead.y >= tileCount) {
-                gameOver = true;
+                endGame();
             } else if (hitsSnake(newHead)) {
-                gameOver = true;
+                endGame();
             }
         }
         // Looking if the new head correspond to a segment in the snake array
@@ -142,6 +143,12 @@
             return snake.some((segment) => {
                 return segment.x === newHead.x && segment.y === newHead.y;
             });
+        };
+
+        // Function to end the game, endgame is called when the game need to be over
+        const endGame = () => {
+            gameOver = true;
+            info.textContent = "Game over! Score: " + score;
         };
     
 
