@@ -52,6 +52,8 @@
             return newFood;
         };
         let direction = { x: 1, y: 0 };
+        let nextDirection = { x: 1, y: 0 };
+        let canTurn = true;
         // Generate a random position for the apple
         let food = generateFood();
         let score = 0;
@@ -86,6 +88,9 @@
             if (gameOver) {
                 return;
             }
+
+            direction = nextDirection;
+            canTurn = true;
 
             // The snake's old head
             const oldHead = snake[0];
@@ -123,11 +128,18 @@
                 changeDirection({ x: 1, y: 0 });
             }
         });
-        // This function prevent the snake against colide itself unexpectedly
+        // This function prevent the snake against colide itself unexpectedly and add a queue to avoid fast key presses
         const changeDirection = (newDirection) => {
-            if (direction.x + newDirection.x !== 0 || direction.y + newDirection.y !== 0) {
-                direction = newDirection;
+            if(!canTurn) {
+                return;
             }
+
+            if (direction.x + newDirection.x === 0 && direction.y + newDirection.y === 0) {
+                return;
+            }
+            
+            nextDirection = newDirection;
+            canTurn = false;
         };
 
         // ===== Eating and growing =====
