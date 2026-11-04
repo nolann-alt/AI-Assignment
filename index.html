@@ -11,7 +11,7 @@
 
     <main class="game">
         <h1>Snake</h1>
-        <p id="info">Score: 0</p>
+        <p id="info">Score: 0 | High score: 0</p>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <button id="restartButton">Restart</button>
     </main>
@@ -57,6 +57,7 @@
         // Generate a random position for the apple
         let food = generateFood();
         let score = 0;
+        let highScore = Number(localStorage.getItem("snakeHighScore")) || 0; // Retrives the highest score stored in local storage
         let gameOver = false;
 
         // This function lets you know which corner round
@@ -227,7 +228,13 @@
                 
                 // Increasing the score
                 score++;
-                info.textContent = "Score: " + score; // Display on the screen the score
+
+                if (score > highScore) {
+                    highScore = score
+                    localStorage.setItem("snakeHighScore", highScore);
+                }
+
+                info.textContent = "Score: " + score + " | High score: " + highScore; // Display on the screen the score
 
                 // Each apple increase the speed by reducing the interval by 10 milliseconds until it reaches 50 milliseconds
                 gameSpeed = Math.max(50, 150 - score * 10);
@@ -258,7 +265,7 @@
         // Function to end the game, endgame is called when the game need to be over
         const endGame = () => {
             gameOver = true;
-            info.textContent = "Game over! Score: " + score;
+            info.textContent = "Game over! Score: " + score + " | High score: " + highScore;
         };
 
     </script>
