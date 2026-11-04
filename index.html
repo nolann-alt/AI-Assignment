@@ -24,6 +24,8 @@
         const ctx = canvas.getContext("2d");
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
+        let gameSpeed = 150; // Speed of the game
+        let gameTimer;
 
         // ===== INITIAL STATE =====
         let snake = [
@@ -185,7 +187,11 @@
             drawGame();
         };
 
-        setInterval(moveSnake, 150);
+        // Starting the game timer with a game speed
+        const startGameTimer = () => {
+            gameTimer = setInterval(moveSnake, gameSpeed)
+        }
+        startGameTimer();
 
         // ===== Keyboard controls =====
         document.addEventListener("keydown", (event) => {
@@ -222,6 +228,11 @@
                 // Increasing the score
                 score++;
                 info.textContent = "Score: " + score; // Display on the screen the score
+
+                // Each apple increase the speed by reducing the interval by 10 milliseconds until it reaches 50 milliseconds
+                gameSpeed = Math.max(50, 150 - score * 10);
+                clearInterval(gameTimer); // We clear the gameTimer to change it by the new one
+                startGameTimer();
                 
             } else {
                 snake.pop(); // removes the last segment
@@ -249,23 +260,6 @@
             gameOver = true;
             info.textContent = "Game over! Score: " + score;
         };
-    
-
-        // ===================================
-        // BUILD THE GAME FROM HERE
-        // ===================================
-        //
-        // Use your custom agent in VS Code Chat 
-        // to guide your work through each step. 
-        // Commit regularly.
-        //
-        // Step 1: Movement (game loop)
-        // Step 2: Keyboard controls (arrow keys)
-        // Step 3: Eating and growing
-        // Step 4: Game over
-        // Step 5: Improvements
-        //
-        // ===================================
 
     </script>
 
