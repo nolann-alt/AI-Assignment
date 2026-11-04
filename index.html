@@ -5,18 +5,16 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
     <title>Snake Game</title>
-    <style>
-        canvas {
-            border: 1px solid black;
-        }
-    </style>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-    <h1>Snake</h1>
-    <canvas id="gameCanvas" width="400"
-            height="400"></canvas>
-    <p id="info"></p>
+    <main class="game">
+        <h1>Snake</h1>
+        <p id="info">Score: 0</p>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <button id="restartButton">Restart</button>
+    </main>
 
     <script>
         // ===== GAME SETUP =====
@@ -59,26 +57,99 @@
         let score = 0;
         let gameOver = false;
 
+        // This function lets you know which corner round
+        const endCorners = (dx, dy) => {
+            if (dx === 1) return [0, 6, 6, 0];
+            if (dx === -1) return [6, 0, 0, 6];
+            if (dy === 1) return [0, 0, 6, 6];
+            return [6, 6, 0, 0];
+        };
+
+        // This function return the correct position of the snake eyes depending on the snake position
+        const eyesPosition = (dx, dy) => {
+            if (dx === 1) return [[14, 6], [14, 14]];
+            if (dx === -1) return [[6, 6], [6, 14]];
+            if (dy === 1) return [[6, 14], [14, 14]];
+            return [[6, 6], [14, 6]];
+        };
+
         // ===== DRAWING =====
         const drawGame = () => {
             ctx.clearRect(0, 0,
                 canvas.width, canvas.height);
 
             ctx.fillStyle = "red";
-            ctx.fillRect(
+            ctx.beginPath();
+            // Round the apple
+            ctx.roundRect(
                 food.x * gridSize,
                 food.y * gridSize,
-                gridSize, gridSize
+                gridSize, gridSize,
+                12
             );
+            ctx.fill(); // Fills the current drawing path with the current dillStyle coulur
 
             ctx.fillStyle = "black";
-            for (const segment of snake) {
-                ctx.fillRect(
-                    segment.x * gridSize,
-                    segment.y * gridSize,
-                    gridSize, gridSize
-                );
-            }
+            // Rounding the first and the last element of the snake body
+            snake.forEach((segment, index) => {
+                const isHead = index === 0; // If it's the head
+                const isTail = index === snake.length - 1; // If it's the last element of the snake
+
+                // Only change the color of the head if it is the generated head
+                ctx.fillStyle = isHead ? "#EF4135" : "#101820";
+                
+                // Select the correct corner to round 
+                let corners;
+                if (isHead) {
+                    corners = endCorners(direction.x, direction.y)
+                } else if (isTail) {
+                    const previous = snake[index - 1];
+                    const tailDirection = {
+                        x: segment.x - previous.x,
+                        y: segment.y - previous.y
+                    };
+                    corners = endCorners(tailDirection.x, tailDirection.y)
+                }
+                
+                // Round the corners only if its the head or the tail
+                if (isHead || isTail) {
+                    ctx.beginPath();
+                    ctx.roundRect(
+                        segment.x * gridSize,
+                        segment.y * gridSize,
+                        gridSize,
+                        gridSize,
+                        corners // Round the corners
+                    );
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(
+                        segment.x * gridSize,
+                        segment.y * gridSize,
+                        gridSize,
+                        gridSize,
+                    );
+                }
+                
+                // Draw the snake eyes
+                const head = snake[0];
+                const eyes = eyesPosition(direction.x, direction.y);
+
+                ctx.fillStyle = "black";
+
+                // Draw the eyes using the correct coordinates
+                for (const [x, y] of eyes) {
+                    ctx.beginPath();
+                    ctx.arc(
+                        head.x * gridSize + x,
+                        head.y * gridSize + y,
+                        2,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.fill();
+                }
+            });
         };
 
         drawGame(); 
@@ -114,7 +185,7 @@
             drawGame();
         };
 
-        setInterval(moveSnake, 200);
+        setInterval(moveSnake, 150);
 
         // ===== Keyboard controls =====
         document.addEventListener("keydown", (event) => {
