@@ -50,3 +50,75 @@ button:hover {
     grid-auto-flow: column;
     grid-column-gap: 10px;
 }
+
+/* --- Start Screen css --- */
+#startScreen {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 12px;
+    background: rgb(0, 0, 0);
+    opacity: 0.8;
+}
+
+#startScreen h2 {
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #ff1100;
+    font-size: 8vh;
+}
+
+#startScreen p {
+    color: #ffffff;
+    font-size: 2vh;
+}
+
+#startButton {
+    background: #ff1100;
+}
+
+#startButton:hover {
+    background: rgb(57, 57, 57);
+}
+
+/* --- Game Over Screen css --- */
+#gameOverScreen {
+    display: none;
+}
+
+#gameOverScreen {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 12px;
+    background: rgb(0, 0, 0);
+    opacity: 0.8;
+}
+
+#gameOverScreen h2 {
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #ff1100;
+    font-size: 8vh;
+}
+
+#gameOverScreen p {
+    color: #ffffff;
+    font-size: 2vh;
+}
+
+#gameOverRestartButton {
+    background: #ff1100;
+}
+
+#gameOverRestartButton:hover {
+    background: rgb(57, 57, 57);
+}

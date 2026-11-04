@@ -18,8 +18,19 @@
             <button id="pauseButton">Pause</button>
             <button id="resetButton">Reset Highest Score</button>
         </div>
-        
     </main>
+
+    <section id="startScreen">
+        <h2>Snake Game</h2>
+        <p>Eat the apples and avoid the walls!</p>
+        <button id="startButton">Start Game</button>
+    </section>
+
+    <section id="gameOverScreen">
+        <h2>Game Over!</h2>
+        <p id="gameOverInfo">Score: 0 | Highest score: 0</p>
+        <button id="gameOverRestartButton">Restart</button>
+    </section>
 
     <script>
         // ===== GAME SETUP =====
@@ -29,6 +40,11 @@
         const restartButton = document.getElementById("restartButton");
         const resetButton = document.getElementById("resetButton");
         const pauseButton = document.getElementById("pauseButton");
+        const startScreen = document.getElementById("startScreen");
+        const gameOverScreen = document.getElementById("gameOverScreen");
+        const gameOverInfo = document.getElementById("gameOverInfo");
+        const gameOverRestartButton = document.getElementById("gameOverRestartButton");
+        const startButton = document.getElementById("startButton");
         const ctx = canvas.getContext("2d");
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
@@ -68,6 +84,7 @@
         let score = 0;
         let highestScore = Number(localStorage.getItem("snakeHighestScore")) || 0; // Retrives the highest score stored in local storage
         let gameOver = false;
+        gameOverScreen.style.display = "none"; // Undisplay the gameOver screen at the beginning
 
         // This function lets you know which corner round
         const endCorners = (dx, dy) => {
@@ -201,7 +218,6 @@
         const startGameTimer = () => {
             gameTimer = setInterval(moveSnake, gameSpeed)
         }
-        startGameTimer();
 
         // ===== Keyboard controls =====
         document.addEventListener("keydown", (event) => {
@@ -272,10 +288,24 @@
             });
         };
 
+        // Function to start the game
+        const startGame = () => {
+            startScreen.style.display = "none"; // Undisplay the start the screen at the beigining
+            gameOver = false;
+            isPaused = false;
+            startButton.disabled = true; // Undisplay the startbutton
+            startGameTimer();
+
+            info.textContent =
+                "Score: " + score + " | Highest score: " + highestScore;
+        };
+
         // Function to end the game, endgame is called when the game need to be over
         const endGame = () => {
             gameOver = true;
-            info.textContent = "Game over! Score: " + score + " | Highest score: " + highestScore;
+            clearInterval(gameTimer); // Clear the timer
+            gameOverInfo.textContent = "Game over! Score: " + score + " | Highest score: " + highestScore;
+            gameOverScreen.style.display = "flex"; // display the gameOver screen at the end of the party
         };
 
         // Pause the game
@@ -300,6 +330,7 @@
 
         // Restart the game with all the variables at their default values
         const restartGame = () => {
+            gameOverScreen.style.display = "none"; // Undisplay the gameOver screen
             clearInterval(gameTimer);
 
             snake = [
@@ -324,7 +355,17 @@
         };
 
         // Button for restarting the game
+        startButton.addEventListener("click", () => {
+            startGame();
+        });
+
+        // Button for restarting the game
         restartButton.addEventListener("click", () => {
+            restartGame();
+        });
+
+        // Button for restarting the game
+        gameOverRestartButton.addEventListener("click", () => {
             restartGame();
         });
 
