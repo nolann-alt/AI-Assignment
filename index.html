@@ -11,9 +11,14 @@
 
     <main class="game">
         <h1>Snake</h1>
-        <p id="info">Score: 0 | High score: 0</p>
+        <p id="info">Score: 0 | Highest score: 0</p>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <button id="restartButton">Restart</button>
+        <div class="btn">
+            <button id="restartButton">Restart</button>
+            <button id="pauseButton">Pause</button>
+            <button id="resetButton">Reset Highest Score</button>
+        </div>
+        
     </main>
 
     <script>
@@ -21,9 +26,13 @@
         const canvas =
             document.getElementById("gameCanvas");
         const info = document.getElementById("info"); // Get the score zone
+        const restartButton = document.getElementById("restartButton");
+        const resetButton = document.getElementById("resetButton");
+        const pauseButton = document.getElementById("pauseButton");
         const ctx = canvas.getContext("2d");
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
+        let isPaused = false;
         let gameSpeed = 150; // Speed of the game
         let gameTimer;
 
@@ -57,7 +66,7 @@
         // Generate a random position for the apple
         let food = generateFood();
         let score = 0;
-        let highScore = Number(localStorage.getItem("snakeHighScore")) || 0; // Retrives the highest score stored in local storage
+        let highestScore = Number(localStorage.getItem("snakeHighestScore")) || 0; // Retrives the highest score stored in local storage
         let gameOver = false;
 
         // This function lets you know which corner round
@@ -228,13 +237,14 @@
                 
                 // Increasing the score
                 score++;
-
-                if (score > highScore) {
-                    highScore = score
-                    localStorage.setItem("snakeHighScore", highScore);
+                
+                // Update the highestScore variable if score is higher than the current score
+                if (score > highestScore) {
+                    highestScore = score
+                    localStorage.setItem("snakeHighestScore", highestScore);
                 }
 
-                info.textContent = "Score: " + score + " | High score: " + highScore; // Display on the screen the score
+                info.textContent = "Score: " + score + " | Highest score: " + highestScore; // Display on the screen the score
 
                 // Each apple increase the speed by reducing the interval by 10 milliseconds until it reaches 50 milliseconds
                 gameSpeed = Math.max(50, 150 - score * 10);
@@ -265,9 +275,75 @@
         // Function to end the game, endgame is called when the game need to be over
         const endGame = () => {
             gameOver = true;
-            info.textContent = "Game over! Score: " + score + " | High score: " + highScore;
+            info.textContent = "Game over! Score: " + score + " | Highest score: " + highestScore;
         };
 
+        // Pause the game
+        const pauseGame = () => {
+            if (gameOver) {
+                return;
+            }
+
+            isPaused = true;
+            clearInterval(gameTimer);
+            pauseButton.textContent = "Resume";
+            info.textContent = "Paused | Score: " + score + " | Highest score: " + highestScore;
+        };
+
+        // Resume the game
+        const resumeGame = () => {
+            isPaused = false;
+            startGameTimer();
+            pauseButton.textContent = "Pause";
+            info.textContent = "Score: " + score + " | Highest score: " + highestScore;
+        };
+
+        // Restart the game with all the variables at their default values
+        const restartGame = () => {
+            clearInterval(gameTimer);
+
+            snake = [
+                { x: 10, y: 10 },
+                { x: 9, y: 10 },
+                { x: 8, y: 10 }
+            ];
+
+            direction = { x: 1, y: 0 };
+            nextDirection = { x: 1, y: 0 };
+            canTurn = true;
+            food = generateFood();
+            score = 0;
+            gameSpeed = 150;
+            gameOver = false;
+            isPaused = false;
+            pauseButton.textContent = "Pause";  
+
+            info.textContent = "Score: 0 | Highest score: " + highestScore;
+            drawGame();
+            startGameTimer();
+        };
+
+        // Button for restarting the game
+        restartButton.addEventListener("click", () => {
+            restartGame();
+        });
+
+         // Button to reset the highest score
+        resetButton.addEventListener("click", () => {
+            highestScore = 0;
+            localStorage.setItem("snakeHighestScore", highestScore);
+            console.log(localStorage.getItem("snakeHighestScore"))
+            info.textContent = "Score: " + score + " | Highest score: " + highestScore;
+        });
+
+        // Button pause logic
+        pauseButton.addEventListener("click", () => {
+            if (isPaused) {
+                resumeGame();
+            } else {
+                pauseGame();
+            }
+        });
     </script>
 
 </body>

@@ -44,3 +44,9 @@ button {
 button:hover {
     background: #000000;
 }
+
+.btn {
+    display: grid;
+    grid-auto-flow: column;
+    grid-column-gap: 10px;
+}
