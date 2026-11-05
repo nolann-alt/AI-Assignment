@@ -23,13 +23,22 @@
     <section id="startScreen">
         <h2>Snake Game</h2>
         <p>Eat the apples and avoid the walls!</p>
+        <label for="difficulty">Choose difficulty:</label>
+        <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+        </select>
         <button id="startButton">Start Game</button>
     </section>
 
     <section id="gameOverScreen">
         <h2>Game Over!</h2>
         <p id="gameOverInfo">Score: 0 | Highest score: 0</p>
-        <button id="gameOverRestartButton">Restart</button>
+        <div class="gameOverbuttons">
+            <button id="gameOverRestartButton">Restart</button>
+            <button id="menu">Menu</button>
+        </div>
     </section>
 
     <script>
@@ -44,12 +53,14 @@
         const gameOverScreen = document.getElementById("gameOverScreen");
         const gameOverInfo = document.getElementById("gameOverInfo");
         const gameOverRestartButton = document.getElementById("gameOverRestartButton");
+        const difficultySelect = document.getElementById("difficulty");
         const startButton = document.getElementById("startButton");
+        const menu = document.getElementById("menu");
         const ctx = canvas.getContext("2d");
         const gridSize = 20;
-        const tileCount = canvas.width / gridSize;
+        let tileCount = canvas.width / gridSize; // I changed const by let to update this variable for the snake difficulties
         let isPaused = false;
-        let gameSpeed = 150; // Speed of the game
+        let baseGameSpeed = 200; // Base speed of the game
         let gameTimer;
 
         // ===== INITIAL STATE =====
@@ -84,7 +95,37 @@
         let score = 0;
         let highestScore = Number(localStorage.getItem("snakeHighestScore")) || 0; // Retrives the highest score stored in local storage
         let gameOver = false;
+        
         gameOverScreen.style.display = "none"; // Undisplay the gameOver screen at the beginning
+        restartButton.style.display = "none";
+
+
+        // List with the different difficulties of this snake game with different speed and different types of area
+        const difficultySettings = {
+            easy: {
+                speed: 200,
+                boardSize: 400
+            },
+            normal: {
+                speed: 150,
+                boardSize: 400
+            },
+            hard: {
+                speed: 100,
+                boardSize: 300
+            }
+        };
+
+        // This function apply the difficulties of the upcoming game
+        const applyDifficulty = () => {
+            const settings = difficultySettings[difficultySelect.value];
+
+            baseGameSpeed = settings.speed;
+            gameSpeed = baseGameSpeed;
+            canvas.width = settings.boardSize;
+            canvas.height = settings.boardSize;
+            tileCount = settings.boardSize / gridSize;
+        };
 
         // This function lets you know which corner round
         const endCorners = (dx, dy) => {
@@ -263,7 +304,7 @@
                 info.textContent = "Score: " + score + " | Highest score: " + highestScore; // Display on the screen the score
 
                 // Each apple increase the speed by reducing the interval by 10 milliseconds until it reaches 50 milliseconds
-                gameSpeed = Math.max(50, 150 - score * 10);
+                gameSpeed = Math.max(100, baseGameSpeed - score * 5);
                 clearInterval(gameTimer); // We clear the gameTimer to change it by the new one
                 startGameTimer();
                 
@@ -290,10 +331,15 @@
 
         // Function to start the game
         const startGame = () => {
+            applyDifficulty(); // Change tileCount first
+            food = generateFood(); // Then generate food inside the new board
+            drawGame();
+
             startScreen.style.display = "none"; // Undisplay the start the screen at the beigining
             gameOver = false;
             isPaused = false;
             startButton.disabled = true; // Undisplay the startbutton
+            
             startGameTimer();
 
             info.textContent =
@@ -304,7 +350,7 @@
         const endGame = () => {
             gameOver = true;
             clearInterval(gameTimer); // Clear the timer
-            gameOverInfo.textContent = "Game over! Score: " + score + " | Highest score: " + highestScore;
+            gameOverInfo.textContent = "Score: " + score + " | Highest score: " + highestScore;
             gameOverScreen.style.display = "flex"; // display the gameOver screen at the end of the party
         };
 
@@ -318,6 +364,8 @@
             clearInterval(gameTimer);
             pauseButton.textContent = "Resume";
             info.textContent = "Paused | Score: " + score + " | Highest score: " + highestScore;
+
+            restartButton.style.display = "block"; // Display the restart button
         };
 
         // Resume the game
@@ -326,11 +374,15 @@
             startGameTimer();
             pauseButton.textContent = "Pause";
             info.textContent = "Score: " + score + " | Highest score: " + highestScore;
+
+            restartButton.style.display = "none"; // Undisplay the restart button
         };
 
         // Restart the game with all the variables at their default values
         const restartGame = () => {
             gameOverScreen.style.display = "none"; // Undisplay the gameOver screen
+            restartButton.style.display = "none"; // Undisplay the restart button
+
             clearInterval(gameTimer);
 
             snake = [
@@ -342,9 +394,9 @@
             direction = { x: 1, y: 0 };
             nextDirection = { x: 1, y: 0 };
             canTurn = true;
+            applyDifficulty();
             food = generateFood();
             score = 0;
-            gameSpeed = 150;
             gameOver = false;
             isPaused = false;
             pauseButton.textContent = "Pause";  
@@ -367,6 +419,30 @@
         // Button for restarting the game
         gameOverRestartButton.addEventListener("click", () => {
             restartGame();
+        });
+
+        // Button for show the menu
+        menu.addEventListener("click", () => {
+            clearInterval(gameTimer);
+            gameOver = true;
+
+            snake = [
+                { x: 10, y: 10 },
+                { x: 9, y: 10 },
+                { x: 8, y: 10 }
+            ];
+
+            direction = { x: 1, y: 0 };
+            nextDirection = { x: 1, y: 0 };
+            canTurn = true;
+            score = 0;
+
+            info.textContent = "Score: 0 | Highest score: " + highestScore;
+            drawGame();
+
+            startScreen.style.display = "flex"; // Display the starting screen to allow the user changing difficulty
+            gameOverScreen.style.display = "none"; // Display the starting screen to allow the user changing difficulty
+            startButton.disabled = false;
         });
 
          // Button to reset the highest score
